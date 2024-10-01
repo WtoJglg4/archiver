@@ -1,0 +1,3 @@
+package simple
+
+func simple() {

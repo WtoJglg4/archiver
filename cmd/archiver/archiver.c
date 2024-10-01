@@ -21,9 +21,11 @@ error writeFileContents(FILE *archive, const char *filepath);
 error archiveDirectory(FILE *archive, const char *directory);
 
 error RunArchiver(Config cfg){
-    printf("\n%s %s\n", cfg.outputPath, cfg.name);
-    strcat(cfg.outputPath, cfg.name);
-    printf("\n%s\n", cfg.outputPath);
+    if (strcmp(cfg.outputPath, ".") == 0){
+        strcpy(cfg.outputPath, cfg.name);
+    } else{
+        strcat(cfg.outputPath, cfg.name);
+    }
     FILE *archive = fopen(cfg.outputPath, "wb");
     if (!archive) {
         fprintf(stderr,"failed to create archive file, path: %s", cfg.outputPath);
@@ -32,13 +34,13 @@ error RunArchiver(Config cfg){
     return archiveDirectory(archive, cfg.inputPath);
 }
 
+// need to write archives size to file, to process nested archives
 error archiveDirectory(FILE *archive, const char *directory){
     DIR *dir = opendir(directory);
     if (!dir) {
         fprintf(stderr,"failed to open directory: %s", directory);
         return EXIT_FAILURE;
     }
-    // printf("Dir %s len %ld\n", directory, dir->);
     struct dirent *entry;
     error err;
     int entitiesCounter = 0;
