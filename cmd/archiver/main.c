@@ -7,21 +7,25 @@
 error parseCommand(int argc, char* argv[], Config* archiveCfg);
 error run(Config* archiveConfig);
 error validateConfig(Config* archiveConfig);
+#define MAX_NAME_LENGTH 256
 
 int main(int argc, char *argv[]) {
     Config cfg;
     error err = parseCommand(argc, argv, &cfg);
+    printf("PARSE %d", err);
     if (err != EXIT_SUCCESS){
         return err;
     }
     err = validateConfig(&cfg);
-    printf("%s %s %s\n", cfg.inputPath, cfg.outputPath, cfg.name);
     if (err != EXIT_SUCCESS){
         return err;
     }
+    // printf("%s %s %s\n", cfg.inputPath, cfg.outputPath, cfg.name);
+    
     return run(&cfg);
 }
 error run(Config* archiveConfig){
+    printf("pidoras");
     switch (archiveConfig->command){
     case 0: // zip
         return RunArchiver(*archiveConfig);
@@ -60,9 +64,15 @@ error parseCommand(int argc, char* argv[], Config* archiveCfg){
     }
     argv++; // Remove command from arguments
     argc--;
-    archiveCfg->name = "archive.g";
+    archiveCfg->name = malloc(MAX_NAME_LENGTH);
+    if (!archiveCfg->name) {
+        fprintf(stderr, "Memory allocation error\n");
+        return EXIT_FAILURE;
+    }
+    strcpy(archiveCfg->name, "archive.g");
     // Optional arguments processing
     while ((opt = getopt(argc, argv, "i:o:n:")) != -1) {
+        
         switch (opt) {
             case 'i':
                 archiveCfg->inputPath = optarg;
@@ -73,16 +83,18 @@ error parseCommand(int argc, char* argv[], Config* archiveCfg){
                 printf("Output path set to: %s\n", optarg);
                 break;
             case 'n':
-                archiveCfg->name = optarg;
+                strncpy(archiveCfg->name, optarg, MAX_NAME_LENGTH - 3);  // -3 для ".g" и '\0'
+                archiveCfg->name[MAX_NAME_LENGTH - 3] = '\0';  // Убедимся, что строка обрезана правильно
                 strcat(archiveCfg->name, ".g");
-                printf("Archive name set to: %s.g\n", optarg);
+                printf("Archive name set to: %s\n", archiveCfg->name);
                 break;
             default:
-                fprintf(stderr, "Usage: %s <command> [-i input path] [-o output path]\n", argv[0]);
+                fprintf(stderr, "Usage: %s <command> [-i input path] [-o output path] [-n name]\n", argv[0]);
                 fprintf(stderr, "Commands: zip, unzip\n");
                 return EXIT_FAILURE;
         }
     }
+    printf("pidoras");
     // Non-optional args processing
     for (int index = optind; index < argc; index++) {
         printf("Non-option argument: %s\n", argv[index]);
