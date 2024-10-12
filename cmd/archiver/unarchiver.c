@@ -30,7 +30,6 @@ error extractArchive(FILE *archive, const char *outputPath) {
         char fullPath[MAX_PATH];
         snprintf(fullPath, sizeof(fullPath), "%s/%s", outputPath, filepath);
         // Create directory for each path, even its an empty directory
-        printf("CREATING DIR %s\n", fullPath);
         error err = createDirectoryIfNotExists(fullPath, filesize);
         if (err != EXIT_SUCCESS) {
             return err;
@@ -54,9 +53,7 @@ error createDirectoryIfNotExists(const char *path, long filesize) {
     for (char *p = tempPath + 1; *p; p++) {
         if (*p == '/') {
             *p = '\0';  // Temporary setting line`s end
-            printf("PRE_MKDIR %s\n", tempPath);
             if (stat(tempPath, &statbuf) != 0) {
-                printf("MKDIR %s\n", tempPath);
                 error err = mkdir(tempPath, 0755);
                 if (err != EXIT_SUCCESS){
                     fprintf(stderr, "failed to create directory: %s\n", tempPath);
@@ -69,7 +66,6 @@ error createDirectoryIfNotExists(const char *path, long filesize) {
             *p = '/';  // Recovering the line
         }
     }
-    printf(" %s\n", tempPath);
     if ((stat(tempPath, &statbuf) != 0) && filesize == -1){
         if (mkdir(tempPath, 0755) != 0 && errno != EEXIST) {
             fprintf(stderr, "failed to create directory: %s\n", tempPath);

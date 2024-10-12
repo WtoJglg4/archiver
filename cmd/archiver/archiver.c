@@ -21,14 +21,11 @@ error writeFileContents(FILE *archive, const char *filepath);
 error archiveDirectory(FILE *archive, const char *directory);
 
 error RunArchiver(Config cfg){
-    printf("asdasd");
     if (strcmp(cfg.outputPath, ".") == 0){
         strcpy(cfg.outputPath, cfg.name);
     } else{
         strcat(cfg.outputPath, cfg.name);
     }
-    // printf("%d", 1);
-    printf("asdasd");
     FILE *archive = fopen(cfg.outputPath, "wb");
     if (!archive) {
         fprintf(stderr,"failed to create archive file, path: %s", cfg.outputPath);
@@ -103,6 +100,7 @@ error writeFileContents(FILE *archive, const char *filepath) {
     }
     fread(buffer, 1, filesize, file);
     fwrite(buffer, 1, filesize, archive);
+    fprintf(archive, "\n");
     free(buffer);
     fclose(file);
     return EXIT_SUCCESS;

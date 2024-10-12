@@ -12,7 +12,6 @@ error validateConfig(Config* archiveConfig);
 int main(int argc, char *argv[]) {
     Config cfg;
     error err = parseCommand(argc, argv, &cfg);
-    printf("PARSE %d", err);
     if (err != EXIT_SUCCESS){
         return err;
     }
@@ -20,12 +19,9 @@ int main(int argc, char *argv[]) {
     if (err != EXIT_SUCCESS){
         return err;
     }
-    // printf("%s %s %s\n", cfg.inputPath, cfg.outputPath, cfg.name);
-    
     return run(&cfg);
 }
 error run(Config* archiveConfig){
-    printf("pidoras");
     switch (archiveConfig->command){
     case 0: // zip
         return RunArchiver(*archiveConfig);
@@ -36,12 +32,6 @@ error run(Config* archiveConfig){
 }
 
 error validateConfig(Config* archiveConfig){
-    // if (strcmp(archiveConfig->inputPath, ".") == 0){
-    //     archiveConfig->inputPath = "";
-    // }
-    // if (strcmp(archiveConfig->outputPath, ".") == 0){
-    //     archiveConfig->outputPath = "";
-    // }
     if (archiveConfig->command != 1 && archiveConfig->command != 0 || strcmp(archiveConfig->name, ".")==0){
         fprintf(stderr, "invalid command code\n");
         return EXIT_FAILURE;
@@ -94,7 +84,6 @@ error parseCommand(int argc, char* argv[], Config* archiveCfg){
                 return EXIT_FAILURE;
         }
     }
-    printf("pidoras");
     // Non-optional args processing
     for (int index = optind; index < argc; index++) {
         printf("Non-option argument: %s\n", argv[index]);
